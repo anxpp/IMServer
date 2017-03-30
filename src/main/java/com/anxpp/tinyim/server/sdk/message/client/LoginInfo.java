@@ -1,9 +1,15 @@
-package com.anxpp.tinyim.server.sdk.protocal.c;
+package com.anxpp.tinyim.server.sdk.message.client;
 
+/**
+ * 登陆信息
+ */
 public class LoginInfo {
-    private String username = null;
-    private String password = null;
-    private String extra = null;
+    //用户名
+    private String username;
+    //密码
+    private String password;
+    //额外信息
+    private String extra;
 
     public LoginInfo(String username, String password, String extra) {
         this.username = username;

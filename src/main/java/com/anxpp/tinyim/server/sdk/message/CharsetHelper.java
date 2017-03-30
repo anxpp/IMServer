@@ -1,4 +1,4 @@
-package com.anxpp.tinyim.server.sdk.protocal;
+package com.anxpp.tinyim.server.sdk.message;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
@@ -6,8 +6,8 @@ import java.nio.charset.CharsetDecoder;
 
 public class CharsetHelper {
     public static final CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
-    public static final String ENCODE_CHARSET = "UTF-8";
-    public static final String DECODE_CHARSET = "UTF-8";
+    private static final String ENCODE_CHARSET = "UTF-8";
+    private static final String DECODE_CHARSET = "UTF-8";
 
     public static String getString(byte[] b, int len) {
         try {

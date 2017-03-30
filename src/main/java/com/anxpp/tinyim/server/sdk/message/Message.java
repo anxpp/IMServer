@@ -1,10 +1,13 @@
-package com.anxpp.tinyim.server.sdk.protocal;
+package com.anxpp.tinyim.server.sdk.message;
 
 import com.google.gson.Gson;
 
 import java.util.UUID;
 
-public class Protocal {
+/**
+ * 消息体
+ */
+public class Message {
     private int type = 0;
     private String dataContent = null;
     private int from = -1;
@@ -13,11 +16,11 @@ public class Protocal {
     private boolean QoS = false;
     private transient int retryCount = 0;
 
-    public Protocal(int type, String dataContent, int from, int to) {
+    public Message(int type, String dataContent, int from, int to) {
         this(type, dataContent, from, to, false, null);
     }
 
-    public Protocal(int type, String dataContent, int from, int to, boolean QoS, String fingerPrint) {
+    public Message(int type, String dataContent, int from, int to, boolean QoS, String fingerPrint) {
         this.type = type;
         this.dataContent = dataContent;
         this.from = from;
@@ -94,7 +97,7 @@ public class Protocal {
 
     public Object clone() {
         // 克隆一个Protocal对象（该对象已重置retryCount数值为0）
-        Protocal cloneP = new Protocal(getType(),
+        Message cloneP = new Message(getType(),
                 getDataContent(), getFrom(), getTo(), isQoS(), getFp());
         return cloneP;
     }

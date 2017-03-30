@@ -1,6 +1,6 @@
 package com.anxpp.tinyim.server.sdk.qos;
 
-import com.anxpp.tinyim.server.sdk.protocal.Protocal;
+import com.anxpp.tinyim.server.sdk.message.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,7 +10,7 @@ import java.awt.event.ActionListener;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class QoS4ReceiveDaemonC2S implements ActionListener {
-    private static final int CHECH_INTERVAL = 300000;
+    private static final int CHECK_INTERVAL = 300000;
     private static final int MESSAGES_VALID_TIME = 600000;
     public static boolean DEBUG = false;
     private static Logger logger = LoggerFactory.getLogger(QoS4ReceiveDaemonC2S.class);
@@ -33,7 +33,7 @@ public class QoS4ReceiveDaemonC2S implements ActionListener {
     }
 
     private void init() {
-        this.timer = new Timer(CHECH_INTERVAL, this);
+        this.timer = new Timer(CHECK_INTERVAL, this);
         this.runnable = () -> {
             // 极端情况下本次循环内可能执行时间超过了时间间隔，此处是防止在前一
             // 次还没有运行完的情况下又重复过劲行，从而出现无法预知的错误
@@ -90,7 +90,7 @@ public class QoS4ReceiveDaemonC2S implements ActionListener {
         return this.timer.isRunning();
     }
 
-    public void addReceived(Protocal p) {
+    public void addReceived(Message p) {
         if ((p != null) && (p.isQoS()))
             addReceived(p.getFp());
     }

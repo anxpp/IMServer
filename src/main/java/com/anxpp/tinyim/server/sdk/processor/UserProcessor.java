@@ -1,7 +1,7 @@
 package com.anxpp.tinyim.server.sdk.processor;
 
 import com.anxpp.tinyim.server.sdk.ServerCoreHandler;
-import com.anxpp.tinyim.server.sdk.protocal.c.LoginInfo;
+import com.anxpp.tinyim.server.sdk.message.client.LoginInfo;
 import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +31,7 @@ public class UserProcessor {
     }
 
     public static int nextUserId(LoginInfo loginInfo) {
-        return ++__id;
+        return loginInfo.getUsername().hashCode();
     }
 
     public static boolean isLogined(IoSession session) {
@@ -76,11 +76,10 @@ public class UserProcessor {
     }
 
     public void __printOnline() {
-        logger.debug("【@】当前在线用户共(" + this.userSessions.size() + ")人------------------->");
+        logger.debug("count of online people:" + this.userSessions.size());
         if (DEBUG) {
-            for (Iterator localIterator = this.userSessions.keySet().iterator(); localIterator.hasNext(); ) {
-                int key = (Integer) localIterator.next();
-                logger.debug("      > user_id=" + key + ",session=" + this.userSessions.get(key).getRemoteAddress());
+            for (Integer key : this.userSessions.keySet()) {
+                logger.debug("user_id=" + key + ",session=" + this.userSessions.get(key).getRemoteAddress());
             }
         }
     }

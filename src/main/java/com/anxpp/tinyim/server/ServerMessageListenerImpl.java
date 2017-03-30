@@ -1,7 +1,7 @@
 package com.anxpp.tinyim.server;
 
 import com.anxpp.tinyim.server.sdk.event.ServerMessageListener;
-import com.anxpp.tinyim.server.sdk.protocal.Protocal;
+import com.anxpp.tinyim.server.sdk.message.Message;
 
 import java.util.ArrayList;
 
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public class ServerMessageListenerImpl implements ServerMessageListener {
     // 消息无法完成实时送达的通知
     @Override
-    public void messagesLost(ArrayList<Protocal> lostMessages) {
+    public void messagesLost(ArrayList<Message> lostMessages) {
         System.out.println("【QoS_S2C事件】收到系统的未实时送达事件通知，当前共有"
                 + lostMessages.size() + "个包QoS保证机制结束，判定为【无法实时送达】！");
     }

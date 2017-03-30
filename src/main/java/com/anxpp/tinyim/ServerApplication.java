@@ -14,7 +14,7 @@ public class ServerApplication {
         SpringApplication.run(ServerApplication.class, args);
     }
 
-
+    //启动服务器
     @Bean
     CommandLineRunner start() {
         return args -> {

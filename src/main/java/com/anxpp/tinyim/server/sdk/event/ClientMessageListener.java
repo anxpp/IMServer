@@ -2,6 +2,9 @@ package com.anxpp.tinyim.server.sdk.event;
 
 import org.apache.mina.core.session.IoSession;
 
+/**
+ * 客户端消息监听
+ */
 public interface ClientMessageListener {
     int onLogin(String username, String password, String extra);
 

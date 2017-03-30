@@ -2,7 +2,7 @@ package com.anxpp.tinyim.server.sdk;
 
 import com.anxpp.tinyim.server.sdk.event.ClientMessageListener;
 import com.anxpp.tinyim.server.sdk.event.ServerMessageListener;
-import com.anxpp.tinyim.server.sdk.protocal.Protocal;
+import com.anxpp.tinyim.server.sdk.message.Message;
 import com.anxpp.tinyim.server.sdk.qos.QoS4ReceiveDaemonC2S;
 import com.anxpp.tinyim.server.sdk.qos.QoS4SendDaemonS2C;
 import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
@@ -31,25 +31,25 @@ public abstract class ServerLauncher {
     }
 
     public static boolean sendData(int from_user_id, int to_user_id, String dataContent) throws Exception {
-        return ServerCoreHandler.sendData(from_user_id, to_user_id, dataContent);
+        return ServerCoreHandler.sendMessage(from_user_id, to_user_id, dataContent);
     }
 
     public static boolean sendData(int from_user_id, int to_user_id, String dataContent, boolean QoS) throws Exception {
-        return ServerCoreHandler.sendData(from_user_id, to_user_id, dataContent, QoS);
+        return ServerCoreHandler.sendMessage(from_user_id, to_user_id, dataContent, QoS);
     }
 
     public static boolean sendData(int from_user_id, int to_user_id
             , String dataContent, boolean QoS, String fingerPrint) throws Exception {
-        return ServerCoreHandler.sendData(from_user_id, to_user_id, dataContent,
+        return ServerCoreHandler.sendMessage(from_user_id, to_user_id, dataContent,
                 QoS, fingerPrint);
     }
 
-    public static boolean sendData(Protocal p) throws Exception {
-        return ServerCoreHandler.sendData(p);
+    public static boolean sendData(Message p) throws Exception {
+        return ServerCoreHandler.sendMessage(p);
     }
 
-    public static boolean sendData(IoSession session, Protocal p) throws Exception {
-        return ServerCoreHandler.sendData(session, p);
+    public static boolean sendData(IoSession session, Message p) throws Exception {
+        return ServerCoreHandler.sendMessage(session, p);
     }
 
     public static void setSenseMode(SenseMode mode) {
@@ -87,6 +87,7 @@ public abstract class ServerLauncher {
     }
 
     public void shutdown() {
+
         // ** 取消服务端网络监听
         if (acceptor != null)
             acceptor.dispose();
@@ -111,16 +112,16 @@ public abstract class ServerLauncher {
         this.acceptor.bind(new InetSocketAddress(PORT));
 
         this.running = true;
-        logger.info("[IM_CORE]UDP服务器正在端口" + PORT + "上监听中...");
+        logger.info("server started at " + PORT);
     }
 
-    protected ServerCoreHandler initServerCoreHandler() {
+    private ServerCoreHandler initServerCoreHandler() {
         return new ServerCoreHandler();
     }
 
     protected abstract void initListeners();
 
-    protected NioDatagramAcceptor initAcceptor() {
+    private NioDatagramAcceptor initAcceptor() {
         NioDatagramAcceptor acceptor = new NioDatagramAcceptor();
         acceptor.getFilterChain()
                 .addLast("threadPool", new ExecutorFilter(Executors.newCachedThreadPool()));
@@ -129,16 +130,16 @@ public abstract class ServerLauncher {
         return acceptor;
     }
 
-    protected void initFilter(NioDatagramAcceptor acceptor) {
+    private void initFilter(NioDatagramAcceptor acceptor) {
         DefaultIoFilterChainBuilder chain = acceptor.getFilterChain();
     }
 
-    protected void initSessionConfig(NioDatagramAcceptor acceptor) {
-        DatagramSessionConfig dcfg = acceptor.getSessionConfig();
-        dcfg.setReuseAddress(true);
-//     	dcfg.setReadBufferSize(4096);//设置接收最大字节默认2048
-        dcfg.setReceiveBufferSize(1024);//设置输入缓冲区的大小，调整到2048后性能反而降低
-        dcfg.setSendBufferSize(1024);//1024//设置输出缓冲区的大小，调整到2048后性能反而降低
+    private void initSessionConfig(NioDatagramAcceptor acceptor) {
+        DatagramSessionConfig config = acceptor.getSessionConfig();
+        config.setReuseAddress(true);
+//     	config.setReadBufferSize(4096);//设置接收最大字节默认2048
+        config.setReceiveBufferSize(1024);//设置输入缓冲区的大小，调整到2048后性能反而降低
+        config.setSendBufferSize(1024);//1024//设置输出缓冲区的大小，调整到2048后性能反而降低
     }
 
     public ClientMessageListener getServerEventListener() {

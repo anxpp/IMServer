@@ -1,10 +1,15 @@
-package com.anxpp.tinyim.server.sdk.protocal.s;
+package com.anxpp.tinyim.server.sdk.message.server;
 
-public class PErrorResponse {
+/**
+ * 错误响应消息
+ */
+public class ErrorResponse {
+    //错误码
     private int errorCode = -1;
-    private String errorMsg = null;
+    //错误信息
+    private String errorMsg;
 
-    public PErrorResponse(int errorCode, String errorMsg) {
+    public ErrorResponse(int errorCode, String errorMsg) {
         this.errorCode = errorCode;
         this.errorMsg = errorMsg;
     }
