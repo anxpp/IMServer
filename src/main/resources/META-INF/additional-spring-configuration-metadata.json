@@ -1,0 +1,9 @@
+{
+  "properties": [
+    {
+      "name": "qos.check.interval",
+      "type": "java.lang.Integer",
+      "description": "Description for qos.check.interval."
+    }
+  ]
+}

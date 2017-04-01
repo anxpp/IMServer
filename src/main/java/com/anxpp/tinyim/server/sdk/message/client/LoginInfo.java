@@ -4,6 +4,7 @@ package com.anxpp.tinyim.server.sdk.message.client;
  * 登陆信息
  */
 public class LoginInfo {
+
     //用户名
     private String username;
     //密码

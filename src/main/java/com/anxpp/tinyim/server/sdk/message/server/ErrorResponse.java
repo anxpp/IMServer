@@ -4,6 +4,7 @@ package com.anxpp.tinyim.server.sdk.message.server;
  * 错误响应消息
  */
 public class ErrorResponse {
+
     //错误码
     private int errorCode = -1;
     //错误信息

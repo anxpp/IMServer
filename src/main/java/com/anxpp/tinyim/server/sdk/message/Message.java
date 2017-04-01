@@ -8,34 +8,35 @@ import java.util.UUID;
  * 消息体
  */
 public class Message {
-    private int type = 0;
-    private String dataContent = null;
+    //消息类型
+    private int type;
+    //消息类型
+    private String content;
+    //消息来源
     private int from = -1;
+    //消息目的地
     private int to = -1;
-    private String fp = null;
-    private boolean QoS = false;
+    //消息唯一key
+    private String key = null;
+    //是否支持消息容错
+    private boolean qos = false;
+    //消息重发次数
     private transient int retryCount = 0;
 
-    public Message(int type, String dataContent, int from, int to) {
-        this(type, dataContent, from, to, false, null);
+    public Message(int type, String content, int from, int to) {
+        this(type, content, from, to, false, null);
     }
 
-    public Message(int type, String dataContent, int from, int to, boolean QoS, String fingerPrint) {
+    public Message(int type, String content, int from, int to, boolean qos, String key) {
         this.type = type;
-        this.dataContent = dataContent;
+        this.content = content;
         this.from = from;
         this.to = to;
-        this.QoS = QoS;
-
-        // 只有在需要QoS支持时才生成指纹，否则浪费数据传输流量
-        // 目前一个包的指纹只在对象建立时创建哦
-        if ((QoS) && (fingerPrint == null))
-            this.fp = genFingerPrint();
-        else
-            this.fp = fingerPrint;
+        this.qos = qos;
+        this.key = qos && key == null ? createKey() : key;
     }
 
-    public static String genFingerPrint() {
+    public static String createKey() {
         return UUID.randomUUID().toString();
     }
 
@@ -47,12 +48,12 @@ public class Message {
         this.type = type;
     }
 
-    public String getDataContent() {
-        return this.dataContent;
+    public String getContent() {
+        return this.content;
     }
 
-    public void setDataContent(String dataContent) {
-        this.dataContent = dataContent;
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public int getFrom() {
@@ -71,8 +72,8 @@ public class Message {
         this.to = to;
     }
 
-    public String getFp() {
-        return this.fp;
+    public String getKey() {
+        return this.key;
     }
 
     public int getRetryCount() {
@@ -83,22 +84,20 @@ public class Message {
         this.retryCount += 1;
     }
 
-    public boolean isQoS() {
-        return this.QoS;
+    public boolean isQos() {
+        return this.qos;
     }
 
-    public String toGsonString() {
+    public String toJson() {
         return new Gson().toJson(this);
     }
 
     public byte[] toBytes() {
-        return CharsetHelper.getBytes(toGsonString());
+        return CharsetHelper.getBytes(toJson());
     }
 
     public Object clone() {
         // 克隆一个Protocal对象（该对象已重置retryCount数值为0）
-        Message cloneP = new Message(getType(),
-                getDataContent(), getFrom(), getTo(), isQoS(), getFp());
-        return cloneP;
+        return new Message(getType(), getContent(), getFrom(), getTo(), isQos(), getKey());
     }
 }

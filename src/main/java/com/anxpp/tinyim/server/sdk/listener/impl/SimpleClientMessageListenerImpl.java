@@ -1,13 +1,15 @@
-package com.anxpp.tinyim.server;
+package com.anxpp.tinyim.server.sdk.listener.impl;
 
-import com.anxpp.tinyim.server.sdk.event.ClientMessageListener;
+import com.anxpp.tinyim.server.sdk.listener.ClientMessageListener;
 import org.apache.mina.core.session.IoSession;
+import org.springframework.stereotype.Component;
 
 /**
  * 框架基本事件回调实现类
  * Created by yangtao on 2017/3/30.
  */
-public class ClientMessageListenerImpl implements ClientMessageListener {
+@Component
+public class SimpleClientMessageListenerImpl implements ClientMessageListener {
 
     // 用户身份验证回调方法定义
     // 服务端的应用层可在本方法中实现用户登陆验证。详细请参见API文档说明。
