@@ -7,18 +7,18 @@ import org.springframework.stereotype.Component;
  * qos配置
  * Created by yangtao on 2017/4/1.
  */
-@ConfigurationProperties(prefix = "qos")
 @Component
+@ConfigurationProperties(prefix = "qos")
 public class QosConfig {
 
     //检查间隔
-    private Integer checkInterval;
+    private Integer checkInterval = 5000;
 
     //多少时间内算刚发送的时间
-    private Integer justNowTime;
+    private Integer justNowTime = 2000;
 
     //最大重发次数
-    private Integer maxResendTimes;
+    private Integer maxResendTimes = 3;
 
     public Integer getCheckInterval() {
         return checkInterval;

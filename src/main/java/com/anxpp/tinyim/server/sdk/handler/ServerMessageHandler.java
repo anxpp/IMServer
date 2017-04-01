@@ -1,13 +1,11 @@
 package com.anxpp.tinyim.server.sdk.handler;
 
-import com.anxpp.tinyim.server.sdk.config.Config;
+import com.anxpp.tinyim.server.sdk.service.UserLoginService;
+import com.anxpp.tinyim.server.sdk.config.BaseConfig;
 import com.anxpp.tinyim.server.sdk.listener.ClientMessageListener;
 import com.anxpp.tinyim.server.sdk.listener.ServerMessageListener;
 import com.anxpp.tinyim.server.sdk.manager.SessionManager;
-import com.anxpp.tinyim.server.sdk.message.CharsetHelper;
-import com.anxpp.tinyim.server.sdk.message.Message;
-import com.anxpp.tinyim.server.sdk.message.MessageFactory;
-import com.anxpp.tinyim.server.sdk.message.MessageType;
+import com.anxpp.tinyim.server.sdk.message.*;
 import com.anxpp.tinyim.server.sdk.message.client.LoginInfo;
 import com.anxpp.tinyim.server.sdk.qos.QosReceived;
 import com.anxpp.tinyim.server.sdk.qos.QosSend;
@@ -49,6 +47,9 @@ public class ServerMessageHandler extends IoHandlerAdapter {
 
     @Resource
     private QosSend qosSend;
+
+    @Resource
+    private UserLoginService userLoginService;
 
     /**
      * 发送消息
@@ -174,8 +175,8 @@ public class ServerMessageHandler extends IoHandlerAdapter {
         boolean hasLogin = t_userId > 0;
         //已经登陆过了
         if (hasLogin) {
-            logger.debug("client has already login:" + remoteAddress + "?username=" + loginInfo.getUsername());
-            boolean sendSuccess = sendMessage(session, MessageFactory.createPLoginInfoResponse(0, t_userId));
+            //响应登陆消息
+            boolean sendSuccess = sendMessage(session, MessageFactory.createPLoginInfoResponse(StatusCode.SUCCESS, t_userId));
             if (sendSuccess) {
                 saveSession(t_userId, session, loginInfo);
                 return;
@@ -183,15 +184,17 @@ public class ServerMessageHandler extends IoHandlerAdapter {
             logger.warn("login response failed for:" + remoteAddress);
             return;
         }
-        //未登陆，校验登陆
-        int code = clientMessageListener.onLogin(loginInfo.getUsername(), loginInfo.getPassword(), loginInfo.getExtra());
+        //校验登陆
+        int code = userLoginService.login(loginInfo);
+        //回调用户登陆
+        clientMessageListener.onLogin(loginInfo.getUsername(), loginInfo.getPassword(), loginInfo.getExtra(), code);
         int userId = -1;
         //校验通过
-        if (code == 0) {
+        if (code == StatusCode.SUCCESS) {
             //获取用户ID
-            userId = getNextUserId(loginInfo);
+            userId = userLoginService.findUserId(loginInfo);
             //响应登陆消息
-            boolean sendOK = sendMessage(session, MessageFactory.createPLoginInfoResponse(code, userId));
+            boolean sendOK = sendMessage(session, MessageFactory.createPLoginInfoResponse(StatusCode.SUCCESS, userId));
             if (sendOK) {
                 saveSession(userId, session, loginInfo);
                 return;
@@ -199,6 +202,7 @@ public class ServerMessageHandler extends IoHandlerAdapter {
             logger.warn("login response failed for:" + remoteAddress);
             return;
         }
+        //响应登陆失败
         sendMessage(session, MessageFactory.createPLoginInfoResponse(code, userId));
     }
 
@@ -268,7 +272,7 @@ public class ServerMessageHandler extends IoHandlerAdapter {
         //客户端已接收消息
         if (message.isQos()) {
             if (qosReceived.hasReceived(message.getKey())) {
-                if (Config.DEBUG) {
+                if (BaseConfig.DEBUG) {
                     logger.debug("【IMCORE】【QoS机制】" + message.getKey() + "已经存在于发送列表中，这是重复包，通知业务处理层收到该包罗！");
                 }
                 qosReceived.addReceived(message);
@@ -296,10 +300,6 @@ public class ServerMessageHandler extends IoHandlerAdapter {
         // 将用户信息放入到在线列表中（理论上：每一个存放在在线列表中的session都对应了user_id）
         sessionManager.putUser(userId, session, loginInfo.getUsername());
         this.clientMessageListener.onLoginSuccess(userId, loginInfo.getUsername(), session);
-    }
-
-    private int getNextUserId(LoginInfo loginInfo) {
-        return sessionManager.nextUserId(loginInfo);
     }
 
     private boolean replyForNotLogin(IoSession session, Message message) throws Exception {

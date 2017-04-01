@@ -61,18 +61,17 @@ public class MessageFactory {
                 , user_id, 0);
     }
 
-    public static Message createPLoginInfo(String loginName, String loginPsw, String extra) {
+    public static Message createPLoginInfo(String username, String password, String extra) {
         return new Message(MessageType.Client.LOGIN
-                , create(new LoginInfo(loginName, loginPsw, extra)), -1, 0);
+                , create(new LoginInfo(username, password, extra)), -1, 0);
     }
 
     public static LoginInfo parsePLoginInfo(String dataContentOfProtocal) {
-        return (LoginInfo) parse(dataContentOfProtocal, LoginInfo.class);
+        return parse(dataContentOfProtocal, LoginInfo.class);
     }
 
-    public static Message createPLoginInfoResponse(int code, int user_id) {
-        return new Message(MessageType.Server.RESPONSE_LOGIN,
-                create(new LoginInfoResponse(code, user_id)), 0, user_id, true, Message.createKey());
+    public static Message createPLoginInfoResponse(int code, int userId) {
+        return new Message(MessageType.Server.RESPONSE_LOGIN, create(new LoginInfoResponse(code, userId)), 0, userId, true, Message.createKey());
     }
 
     public static LoginInfoResponse parsePLoginInfoResponse(String dataContentOfProtocal) {

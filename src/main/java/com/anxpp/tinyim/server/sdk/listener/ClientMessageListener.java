@@ -14,7 +14,7 @@ public interface ClientMessageListener {
      * @param extra    额外信息
      * @return 0表示成功，其他为错误码
      */
-    int onLogin(String username, String password, String extra);
+    int onLogin(String username, String password, String extra, int code);
 
     /**
      * 登陆成功的消息

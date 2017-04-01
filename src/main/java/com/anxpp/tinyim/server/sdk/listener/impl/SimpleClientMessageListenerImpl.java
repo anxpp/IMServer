@@ -14,7 +14,7 @@ public class SimpleClientMessageListenerImpl implements ClientMessageListener {
     // 用户身份验证回调方法定义
     // 服务端的应用层可在本方法中实现用户登陆验证。详细请参见API文档说明。
     @Override
-    public int onLogin(String username, String password, String extra) {
+    public int onLogin(String username, String password, String extra, int code) {
         System.out.println("login:user=");
         return 0;
     }

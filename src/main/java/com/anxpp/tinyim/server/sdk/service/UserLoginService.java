@@ -1,7 +1,8 @@
-package com.anxpp.tinyim.server.sdk;
+package com.anxpp.tinyim.server.sdk.service;
 
-import com.anxpp.tinyim.server.sdk.message.client.LoginInfo;
 import com.anxpp.tinyim.server.sdk.message.StatusCode;
+import com.anxpp.tinyim.server.sdk.message.client.LoginInfo;
+import org.springframework.util.ObjectUtils;
 
 /**
  * 用户登陆服务
@@ -14,7 +15,7 @@ public interface UserLoginService {
      * @param loginInfo 登陆信息
      * @return 用户ID，为0时表示获取失败
      */
-    default Integer findUserById(LoginInfo loginInfo) {
+    default Integer findUserId(LoginInfo loginInfo) {
         return loginInfo.getUsername().hashCode();
     }
 
@@ -25,7 +26,7 @@ public interface UserLoginService {
      * @return 登陆返回标志
      */
     default int login(LoginInfo loginInfo) {
-        return StatusCode.SUCCESS;
+        return ObjectUtils.isEmpty(loginInfo) ? StatusCode.FAIL : StatusCode.SUCCESS;
     }
 
 }

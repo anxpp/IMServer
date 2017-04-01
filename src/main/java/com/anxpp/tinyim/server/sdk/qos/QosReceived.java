@@ -1,6 +1,6 @@
 package com.anxpp.tinyim.server.sdk.qos;
 
-import com.anxpp.tinyim.server.sdk.config.Config;
+import com.anxpp.tinyim.server.sdk.config.BaseConfig;
 import com.anxpp.tinyim.server.sdk.message.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +38,7 @@ public class QosReceived implements ActionListener {
             // 次还没有运行完的情况下又重复过劲行，从而出现无法预知的错误
             if (!isRunning) {
                 isRunning = true;
-                if (Config.DEBUG) {
+                if (BaseConfig.DEBUG) {
                     logger.debug("failed message cache length:" + size());
                 }
                 //遍历未接收消息
@@ -46,13 +46,13 @@ public class QosReceived implements ActionListener {
                     long delay = System.currentTimeMillis() - receivedMessages.get(key);
                     if (delay < MESSAGES_VALID_TIME)
                         continue;
-                    if (Config.DEBUG)
+                    if (BaseConfig.DEBUG)
                         logger.debug("receiver key:" + key + " will be delete because if MESSAGES_VALID_TIME");
                     //移除消息
                     receivedMessages.remove(key);
                 }
             }
-            if (Config.DEBUG) {
+            if (BaseConfig.DEBUG) {
                 QosReceived.logger.debug("qos for receive thread running for length:" + size());
             }
             isRunning = false;

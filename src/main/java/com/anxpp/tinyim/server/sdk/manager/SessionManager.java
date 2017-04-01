@@ -1,9 +1,7 @@
 package com.anxpp.tinyim.server.sdk.manager;
 
 import com.anxpp.tinyim.server.sdk.handler.ServerMessageHandler;
-import com.anxpp.tinyim.server.sdk.UserLoginService;
-import com.anxpp.tinyim.server.sdk.config.Config;
-import com.anxpp.tinyim.server.sdk.message.client.LoginInfo;
+import com.anxpp.tinyim.server.sdk.config.BaseConfig;
 import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,9 +17,6 @@ import java.util.HashMap;
 public class SessionManager {
 
     @Resource
-    private UserLoginService userLoginService;
-
-    @Resource
     private ServerMessageHandler serverMessageHandler;
 
     public static final String USER_ID_IN_SESSION_ATTRIBUTE = "__user_id__";
@@ -32,16 +27,6 @@ public class SessionManager {
     private final HashMap<Integer, IoSession> userSessions = new HashMap<>();
     //用户名session
     private HashMap<Integer, String> userNames = new HashMap<>();
-
-    /**
-     * 获取用户ID
-     *
-     * @param loginInfo 登陆信息
-     * @return ID
-     */
-    public int nextUserId(LoginInfo loginInfo) {
-        return userLoginService.findUserById(loginInfo);
-    }
 
     /**
      * 是否已登陆
@@ -112,7 +97,7 @@ public class SessionManager {
      */
     public void printOnline() {
         logger.debug("count of online people:" + this.userSessions.size());
-        if (Config.DEBUG) {
+        if (BaseConfig.DEBUG) {
             for (Integer key : this.userSessions.keySet()) {
                 logger.debug("user_id=" + key + ",session=" + this.userSessions.get(key).getRemoteAddress());
             }
@@ -173,18 +158,6 @@ public class SessionManager {
     }
 
     public IoSession getSession(int userId) {
-        return (IoSession) this.userSessions.get(userId);
-    }
-
-    public String getLoginName(int userId) {
-        return (String) this.userNames.get(userId);
-    }
-
-    public HashMap<Integer, IoSession> getUserSessions() {
-        return this.userSessions;
-    }
-
-    public HashMap<Integer, String> getUserNames() {
-        return this.userNames;
+        return this.userSessions.get(userId);
     }
 }

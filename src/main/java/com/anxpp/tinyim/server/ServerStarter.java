@@ -1,8 +1,7 @@
 package com.anxpp.tinyim.server;
 
-import com.anxpp.tinyim.server.sdk.config.Config;
+import com.anxpp.tinyim.server.sdk.config.BaseConfig;
 import com.anxpp.tinyim.server.sdk.handler.ServerMessageHandler;
-import com.anxpp.tinyim.server.sdk.listener.ServerMessageListener;
 import com.anxpp.tinyim.server.sdk.qos.QosReceived;
 import com.anxpp.tinyim.server.sdk.qos.QosSend;
 import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
@@ -23,15 +22,13 @@ import java.util.concurrent.Executors;
  * 服务端启动入口
  */
 @Component
-public abstract class ServerStarter {
+public class ServerStarter {
 
     private static int SESSION_RECYCLER_EXPIRE = 10;
-    private static Logger logger = LoggerFactory.getLogger(ServerStarter.class);
+    private static Logger log = LoggerFactory.getLogger(ServerStarter.class);
 
     @Resource
     private ServerMessageHandler serverMessageHandler;
-    @Resource
-    private ServerMessageListener serverMessageListener;
     @Resource
     private QosReceived qosReceived;
     @Resource
@@ -61,8 +58,8 @@ public abstract class ServerStarter {
         config.setSendBufferSize(1024);//1024//设置输出缓冲区的大小，调整到2048后性能反而降低
         qosReceived.startup();
         qosSend.startup();
-        acceptor.bind(new InetSocketAddress(Config.PORT));
-        logger.info("server started at " + Config.PORT);
+        acceptor.bind(new InetSocketAddress(BaseConfig.PORT));
+        log.info("server started at " + BaseConfig.PORT);
     }
 
     private NioDatagramAcceptor initAcceptor() {
@@ -76,17 +73,5 @@ public abstract class ServerStarter {
 
     private void initFilter(NioDatagramAcceptor acceptor) {
         DefaultIoFilterChainBuilder chain = acceptor.getFilterChain();
-    }
-
-    public static enum SenseMode {
-        MODE_3S,
-        MODE_10S,
-        MODE_30S,
-        MODE_60S,
-        MODE_120S
-    }
-
-    public ServerMessageListener getServerMessageListener() {
-        return serverMessageListener;
     }
 }

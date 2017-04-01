@@ -1,6 +1,6 @@
 package com.anxpp.tinyim.server.sdk.qos;
 
-import com.anxpp.tinyim.server.sdk.config.Config;
+import com.anxpp.tinyim.server.sdk.config.BaseConfig;
 import com.anxpp.tinyim.server.sdk.config.QosConfig;
 import com.anxpp.tinyim.server.sdk.handler.ServerMessageHandler;
 import com.anxpp.tinyim.server.sdk.listener.ServerMessageListener;
@@ -48,7 +48,8 @@ public class QosSend {
 
     //初始化定时器
     public QosSend() {
-        timer = new Timer(qosConfig.getCheckInterval(), actionListener -> listen());
+        int interval = qosConfig.getCheckInterval();
+        timer = new Timer(interval, actionListener -> listen());
     }
 
     private void listen() {
@@ -56,7 +57,7 @@ public class QosSend {
             isRunning = true;
             //重发失败的消息
             ArrayList<Message> lostMessages = new ArrayList<>();
-            if (Config.DEBUG) {
+            if (BaseConfig.DEBUG) {
                 logger.debug("qos of send begin check:" + size());
             }
             for (String key : allFailedMessage.keySet()) {
@@ -83,7 +84,7 @@ public class QosSend {
     private ArrayList<Message> doQos(Message message) {
         ArrayList<Message> failedMessages = new ArrayList<>();
         if (message.getRetryCount() >= qosConfig.getMaxResendTimes()) {
-            if (Config.DEBUG) {
+            if (BaseConfig.DEBUG) {
                 logger.debug("key of qos send:" + message.getKey() + " has retry for max " + message.getRetryCount() + " times and will be remove");
             }
             //发送失败消息
@@ -93,7 +94,7 @@ public class QosSend {
         } else {
             long delay = System.currentTimeMillis() - allFailedMessageTimeStrap.get(message.getKey());
             if (delay <= qosConfig.getJustNowTime()) {
-                if (Config.DEBUG)
+                if (BaseConfig.DEBUG)
                     logger.warn("key of qos send is a just now message");
             } else {
                 boolean sendOK = false;
@@ -105,7 +106,7 @@ public class QosSend {
                     allFailedMessageTimeStrap.remove(message.getKey());
                 else
                     message.increaseRetryCount();
-                if (Config.DEBUG) {
+                if (BaseConfig.DEBUG) {
                     logger.debug(sendOK ? "key of qos send:" + message.getKey() + " has be retry success" : "key of qos send:" + message.getKey() + " resend failed  times:" + message.getRetryCount());
                 }
             }
@@ -124,8 +125,6 @@ public class QosSend {
 
     /**
      * 开启消息服务质量检查
-     *
-     * @return 服务质量检查工具
      */
     public void startup() {
         stop();
@@ -145,22 +144,22 @@ public class QosSend {
 
     public void put(Message message) {
         if (message == null) {
-            if (Config.DEBUG)
+            if (BaseConfig.DEBUG)
                 logger.warn("Invalid arg message==null.");
             return;
         }
         if (message.getKey() == null) {
-            if (Config.DEBUG)
+            if (BaseConfig.DEBUG)
                 logger.warn("Invalid arg message.getKey() == null.");
             return;
         }
         if (!message.isQos()) {
-            if (Config.DEBUG)
+            if (BaseConfig.DEBUG)
                 logger.warn("This protocal is not QoS pkg, ignore it!");
             return;
         }
         if (this.allFailedMessage.get(message.getKey()) != null) {
-            if (Config.DEBUG) {
+            if (BaseConfig.DEBUG) {
                 logger.warn("【IMCORE】【QoS发送方】指纹为" + message.getKey() + "的消息已经放入了发送质量保证队列，该消息为何会重复？（生成的指纹码重复？还是重复put？）");
             }
         }
