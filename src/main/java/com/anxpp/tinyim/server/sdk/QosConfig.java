@@ -1,4 +1,4 @@
-package com.anxpp.tinyim.server.sdk.config;
+package com.anxpp.tinyim.server.sdk;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -42,5 +42,14 @@ public class QosConfig {
 
     public void setMaxResendTimes(Integer maxResendTimes) {
         this.maxResendTimes = maxResendTimes;
+    }
+
+    @Override
+    public String toString() {
+        return "QosConfig{" +
+                "checkInterval=" + checkInterval +
+                ", justNowTime=" + justNowTime +
+                ", maxResendTimes=" + maxResendTimes +
+                '}';
     }
 }

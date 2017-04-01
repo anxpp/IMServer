@@ -1,7 +1,7 @@
 package com.anxpp.tinyim.server.sdk.qos;
 
 import com.anxpp.tinyim.server.sdk.config.BaseConfig;
-import com.anxpp.tinyim.server.sdk.config.QosConfig;
+import com.anxpp.tinyim.server.sdk.QosConfig;
 import com.anxpp.tinyim.server.sdk.handler.ServerMessageHandler;
 import com.anxpp.tinyim.server.sdk.listener.ServerMessageListener;
 import com.anxpp.tinyim.server.sdk.message.Message;
@@ -46,10 +46,13 @@ public class QosSend {
     //定时器
     private Timer timer;
 
-    //初始化定时器
-    public QosSend() {
-        int interval = qosConfig.getCheckInterval();
-        timer = new Timer(interval, actionListener -> listen());
+    /**
+     * 开启服务
+     */
+    public synchronized void startup() {
+        stop();
+        (timer = new Timer(qosConfig.getCheckInterval(), actionListener -> listen())).setInitialDelay(qosConfig.getCheckInterval());
+        timer.start();
     }
 
     private void listen() {
@@ -121,15 +124,6 @@ public class QosSend {
      */
     private void notifyMessageLost(ArrayList<Message> lostMessages) {
         serverMessageListener.messagesLost(lostMessages);
-    }
-
-    /**
-     * 开启消息服务质量检查
-     */
-    public void startup() {
-        stop();
-        timer.setInitialDelay(qosConfig.getCheckInterval());
-        timer.start();
     }
 
     public void stop() {
